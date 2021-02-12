@@ -16,15 +16,34 @@ It is laid out by function and grouped into appropriate headings ranging from de
 
 * 2. Installation
 
-I'll add this one day...
+To install this configuration I would recommend removing the `.emacs`
+file and `.emacs.d` directory from your home folder.
 
-** Bug Fix for ELPA keyring
+Then copy and past the contents of emacs-config directory to your home
+folder and open emacs.
+
+Below can be found a series of bug fixes for this emacs configuration.
+
+** Bug fix: TLS 3.1 is Broken in Emacs 25.3
+
+This is apparently fixed in Emacs 27, but to resolve here I add the
+following code to fall back to TLS 1.3:
 
 #+BEGIN_SRC emacs-lisp
 (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")
-(setq package-check-signature nil)
-(use-package gnu-elpa-keyring-update :ensure t)
-(setq package-check-signature 'allow-unsigned)
+#+END_SRC
+
+** Bug fix: ELPA keyring update
+
+This fix resolves issues with the ELPA keyring and installs the
+updated configuration.
+
+#+BEGIN_SRC emacs-lisp
+(if (require 'gnu-elpa-keyring-update :noerror)
+  (use-package gnu-elpa-keyring-update :ensure t)
+  ((setq package-check-signature nil)
+   (use-package gnu-elpa-keyring-update :ensure t)
+   (setq package-check-signature 'allow-unsigned)))
 #+END_SRC
 
 * 3. Default Behaviours
@@ -270,18 +289,7 @@ decrementing font sizes
   (chortle/reset-font)
 #+END_SRC
 
-** 4.2 Org-bullets
-
-I prefer that the bullets as something more aesthetically pleasing and org-bullets is great for this.
-
-#+BEGIN_SRC emacs-lisp
-(use-package org-bullets :ensure t)
-(add-hook 'org-mode-hook #'org-bullets-mode)
-(setq org-startup-indented t)
-(setq org-hide-leading-stars t)
-#+END_SRC
-
-** 4.3 Hide toolbar & menubar
+** 4.2 Hide toolbar & menubar
 
 Given I rarely use either this frees up some space I can use for documents
 
@@ -295,7 +303,7 @@ Given I rarely use either this frees up some space I can use for documents
   (setq frame-title-format '((:eval (projectile-project-name))))
 #+END_SRC
 
-** 4.4 Other minor tweaks
+** 4.3 Other minor tweaks
 
 Here are a few other bits I include because I can. I haven't really thought through how to organise them given they are basically tiny snippets
 
@@ -332,7 +340,7 @@ Because this tiny emacs window opens by default.
 (add-to-list 'default-frame-alist '(fullscreen . maximized))
 #+END_SRC
 
-** 4.5 Theme Selection
+** 4.4 Theme Selection
 
 I will be using the manoj-dark theme for emacs and a daemon to ensure
 that themes are applied continuously.
@@ -360,7 +368,7 @@ that themes are applied continuously.
       (load-theme 'zenburn t))
 #+END_SRC
 
-** 4.6 Custom Mode Line
+** 4.5 Custom Mode Line
 
 A little handy feature that works really well thanks manu.el!
 
@@ -519,29 +527,13 @@ Moody is a tab feature for the mode line and I like this a lot
     (moody-replace-mode-line-buffer-identification)
     (moody-replace-vc-mode))
 #+END_SRC
-* 6. Bug Fixes
+** 5.9 Org Bullets
 
-The following are a series of known bugs within the emacs version I
-discovered when testing this configuration. As such I apply the follow
-fixes to resolve issues
-
-** TLS 3.1 is Broken in Emacs 25.3
-
-To resolve I add the following code to fall back to TLS 1.3:
+I prefer that the bullets as something more aesthetically pleasing and org-bullets is great for this.
 
 #+BEGIN_SRC emacs-lisp
-(setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")
+(use-package org-bullets :ensure t)
+(add-hook 'org-mode-hook #'org-bullets-mode)
+(setq org-startup-indented t)
+(setq org-hide-leading-stars t)
 #+END_SRC
-
-This is apparently fixed in Emacs 27.
-
-** PGP Key's are expired
-
-This one is a pain in the ass to fix given it's solution is to install
-keys via a package which you can't due to expired PGP keys.
-
-*** MANUAL SOLUTION: Disable package signature checking
-[] M-x set-variable
-[] package-check-signature RET nil
-[] M-x package-install RET gnu-elpa-keyring-update
-[] M-x gnu-elpa-keyring-update

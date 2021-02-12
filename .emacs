@@ -1,12 +1,9 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
 ;; Chortles Emacs Configuration File (DESKTOP EDN.)
-;; Emacs v25.3 
+;; Emacs v25.3
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;; Resolve the TLS bug that prevented me updating packages
-(setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")
 
 ;; Configure the package manager
 (require 'package)
