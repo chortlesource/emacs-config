@@ -228,11 +228,15 @@ Below are key bindings I've found useful to add
 #+END_SRC
 
 *** Add SRC blocks quickly for convenience
+
+The following src blocks can be used with < [VAR] and then tab.
+
 #+BEGIN_SRC emacs-lisp
-(add-to-list 'org-structure-template-alist '("el" "#+BEGIN_SRC emacs-lisp\n?\n#+END_SRC"))
-(add-to-list 'org-structure-template-alist '("cpp" "#+BEGIN_SRC C++\n?\n#+END_SRC"))
-(add-to-list 'org-structure-template-alist '("b" "#+BEGIN_SRC bash\n\n#+END_SRC"))
-(global-set-key (kbd "C-c C-,") 'org-insert-structure-template)
+(setq org-structure-template-alist
+  '(("el" . "#+BEGIN_SRC emacs-lisp\n?\n#+END_SRC")
+   ("c" . "#+BEGIN_SRC C\n?\n#+END_SRC")
+   ("C" . "#+BEGIN_SRC C++\n?\n#+END_SRC")
+   ("b" . "#+BEGIN_SRC bash\n\n#+END_SRC")))
 #+END_SRC
 
 *** Window split orientation
@@ -263,7 +267,23 @@ Below are key bindings I've found useful to add
       (select-window first-win)
       (if this-win-2nd (other-window 1))))))
 
-(global-set-key (kbd "C-x |") 'toggle-window-split)
+(use-package transpose-frame :ensure t)
+(global-set-key (kbd "C-c |") 'toggle-window-split)
+(global-set-key (kbd "C-c <right>") 'rotate-frame-clockwise)
+#+END_SRC
+
+*** Start a shell
+
+For convenience I bind the shell command
+
+#+BEGIN_SRC emacs-lisp
+  (global-set-key (kbd "C-c C-.") 'shell)
+#+END_SRC
+
+*** Toggle speedbar
+
+#+BEGIN_SRC emacs-lisp
+  (global-set-key (kbd "C-c s") 'sr-speedbar-toggle)
 #+END_SRC
 
 * 4. Display Preferences
@@ -277,7 +297,7 @@ Functions to handle the default font, and incrementing and
 decrementing font sizes
 
 #+BEGIN_SRC emacs-lisp
-    (setq chortle/default-font "Cantarell")
+    (setq chortle/default-font "Hack")
     (setq chortle/default-font-size 12)
     (setq chortle/current-font-size chortle/default-font-size)
     (setq chortle/font-change-incr 1.1)
@@ -442,7 +462,7 @@ A little handy feature that works really well thanks manu.el!
 
 I use a variety of packages to manage certain elements of documents. These are installed by default using use-package
 
-** 5.1 Use Package configuration
+** 5.1  Use Package configuration
 
 Configure use package so that I can get what I need.
 
@@ -454,13 +474,13 @@ Configure use package so that I can get what I need.
 (setq load-prefer-newer t)
 #+END_SRC
 
-** 5.2 Popup
+** 5.2  Popup
 
 #+BEGIN_SRC emacs-lisp
 (use-package popup :ensure t)
 #+END_SRC
 
-** 5.3 Spell Checking
+** 5.3  Spell Checking
 
 I use flycheck and fly spell for spelling. As frankly this is a must have for emacs and I need something to make sure that documents are somewhat coherent.
 
@@ -484,7 +504,7 @@ I use flycheck and fly spell for spelling. As frankly this is a must have for em
   (add-hook 'mu4e-compose-mode-hook 'flyspell-mode))
 #+END_SRC
 
-** 5.4 Thesaurus
+** 5.4  Thesaurus
 Because I'm forever looking for "that word"
 
 #+BEGIN_SRC emacs-lisp
@@ -494,7 +514,7 @@ Because I'm forever looking for "that word"
 (define-key global-map "\C-xs" 'synosaurus-lookup)
 #+END_SRC
 
-** 5.5 Magit
+** 5.5  Magit
 
 I like to use version tracking with the documents and software I
 produce. Magit it a useful interface to manage.
@@ -518,7 +538,7 @@ produce. Magit it a useful interface to manage.
   (use-package ghub)
 #+END_SRC
 
-** 5.6 Eyebrowse
+** 5.6  Eyebrowse
 
 To manage work spaces and keep my head clear I use eyebrowse which
 employs C-c C-w # to open a new workspace and C-c C-w " to close.
@@ -531,7 +551,7 @@ employs C-c C-w # to open a new workspace and C-c C-w " to close.
   (eyebrowse-mode t))
 #+END_SRC
 
-** 5.7 Minions
+** 5.7  Minions
 
 Minions is a minior mode menu for the mode line for simplicity
 
@@ -545,7 +565,7 @@ Minions is a minior mode menu for the mode line for simplicity
     (minions-mode 1))
 #+END_SRC
 
-** 5.8 Moody
+** 5.8  Moody
 
 Moody is a tab feature for the mode line and I like this look
 
@@ -557,7 +577,7 @@ Moody is a tab feature for the mode line and I like this look
     (moody-replace-vc-mode))
 #+END_SRC
 
-** 5.9 Org Bullets
+** 5.9  Org Bullets
 
 I prefer that the bullets as something more aesthetically pleasing and org-bullets is great for this.
 
@@ -566,4 +586,81 @@ I prefer that the bullets as something more aesthetically pleasing and org-bulle
 (add-hook 'org-mode-hook #'org-bullets-mode)
 (setq org-startup-indented t)
 (setq org-hide-leading-stars t)
+#+END_SRC
+
+** 5.10 Speedbar
+
+#+BEGIN_SRC emacs-lisp
+  (use-package sr-speedbar)
+  (setq sr-speedbar-width 20)
+  (add-hook 'emacs-startup-hook
+            (lambda() (sr-speedbar-open)))
+#+END_SRC
+
+* 6. Development
+
+To utilise emacs effectively as a development environment I utilise
+the following packages which enable me to write and compile code
+within emacs.
+
+** 6.1 CEDET
+
+CEDET assist with code completion. I'm not entirely sure I like this
+but I've added it for now and we will see how effective it actually is.
+
+#+BEGIN_SRC emacs-lisp
+(require 'semantic)
+(global-semanticdb-minor-mode 1)
+(global-semantic-idle-scheduler-mode 1)
+(semantic-mode 1)
+
+(setq semantic-new-buffer-setup-functions
+      (cl-remove-if (lambda (buffer-setup-function)
+                   (member (car buffer-setup-function)
+                           '(python-mode html-mode)))
+                 semantic-new-buffer-setup-functions))
+
+(remove-hook 'python-mode-hook 'wisent-python-default-setup)
+
+(defun company-semantic-setup ()
+  "Configure company-backends for company-semantic and company-yasnippet."
+  (delete 'company-irony company-backends)
+  (push '(company-semantic :with company-yasnippet) company-backends))
+
+(global-ede-mode 1)
+
+(setq ede-custom-file (expand-file-name "config/cc-mode-projects.el" user-emacs-directory))
+(when (file-exists-p ede-custom-file)
+  (load ede-custom-file))
+
+(use-package company-c-headers)
+(defun company-c-headers-setup ()
+  (add-to-list 'company-backends 'company-c-headers))
+
+(defun ede-object-system-include-path ()
+  (when ede-object
+    (ede-system-include-path ede-object)))
+(setq company-c-headers-path-system 'ede-object-system-include-path)
+
+(add-hook 'c++-mode-hook 'company-c-headers-setup)
+(add-hook 'c-mode-hook 'company-c-headers-setup)
+(add-hook 'c++-mode-hook 'company-semantic-setup)
+(add-hook 'c-mode-hook 'company-semantic-setup)
+#+END_SRC
+
+** 6.1 CMake
+
+Cmake is a build essential :)
+
+#+BEGIN_SRC emacs-lisp
+(use-package cmake-mode)
+(setq auto-mode-alist
+      (append
+       '(("CMakeLists\\.txt\\'" . cmake-mode))
+       '(("\\.cmake\\'" . cmake-mode))
+       auto-mode-alist))
+
+(defun company-cmake-setup ()
+  (add-to-list 'company-backends 'company-cmake))
+(add-hook 'cmake-mode-hook 'company-cmake-setup)
 #+END_SRC
