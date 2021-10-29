@@ -17,6 +17,7 @@ In conclusion this is only available on github in the event of hardware failure 
 As suggested I haven't got this installing flawlessly at this point. Typically when I first install I receive errors on the first four attempts to load. Eventually things compile properly; which is not the kind of reassuring statement I like to read.
 
 * Backup your current emacs configuration. (ie `.emacs` and `.emacs.d`)
+* Ensure that the font "hack" is installed
 * `rm -rf ~/.emacs ~/.emacs.d`
 * `git clone git@github.com:chortlesource/emacs-config.git`
 * copy the .emacs and .emacs.d from the emacs-config folder to your home directory
