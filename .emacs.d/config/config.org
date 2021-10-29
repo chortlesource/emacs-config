@@ -588,79 +588,21 @@ I prefer that the bullets as something more aesthetically pleasing and org-bulle
 (setq org-hide-leading-stars t)
 #+END_SRC
 
-** 5.10 Speedbar
+** 5.10 Org Journal
+
+I want to be able to easily keep a journal using org journal
 
 #+BEGIN_SRC emacs-lisp
-  (use-package sr-speedbar)
-  (setq sr-speedbar-width 20)
-  (add-hook 'emacs-startup-hook
-            (lambda() (sr-speedbar-open)))
-#+END_SRC
-
-* 6. Development
-
-To utilise emacs effectively as a development environment I utilise
-the following packages which enable me to write and compile code
-within emacs.
-
-** 6.1 CEDET
-
-CEDET assist with code completion. I'm not entirely sure I like this
-but I've added it for now and we will see how effective it actually is.
-
-#+BEGIN_SRC emacs-lisp
-(require 'semantic)
-(global-semanticdb-minor-mode 1)
-(global-semantic-idle-scheduler-mode 1)
-(semantic-mode 1)
-
-(setq semantic-new-buffer-setup-functions
-      (cl-remove-if (lambda (buffer-setup-function)
-                   (member (car buffer-setup-function)
-                           '(python-mode html-mode)))
-                 semantic-new-buffer-setup-functions))
-
-(remove-hook 'python-mode-hook 'wisent-python-default-setup)
-
-(defun company-semantic-setup ()
-  "Configure company-backends for company-semantic and company-yasnippet."
-  (delete 'company-irony company-backends)
-  (push '(company-semantic :with company-yasnippet) company-backends))
-
-(global-ede-mode 1)
-
-(setq ede-custom-file (expand-file-name "config/cc-mode-projects.el" user-emacs-directory))
-(when (file-exists-p ede-custom-file)
-  (load ede-custom-file))
-
-(use-package company-c-headers)
-(defun company-c-headers-setup ()
-  (add-to-list 'company-backends 'company-c-headers))
-
-(defun ede-object-system-include-path ()
-  (when ede-object
-    (ede-system-include-path ede-object)))
-(setq company-c-headers-path-system 'ede-object-system-include-path)
-
-(add-hook 'c++-mode-hook 'company-c-headers-setup)
-(add-hook 'c-mode-hook 'company-c-headers-setup)
-(add-hook 'c++-mode-hook 'company-semantic-setup)
-(add-hook 'c-mode-hook 'company-semantic-setup)
-#+END_SRC
-
-** 6.1 CMake
-
-Cmake is a build essential :)
-
-#+BEGIN_SRC emacs-lisp
-(use-package cmake-mode)
-(setq auto-mode-alist
-      (append
-       '(("CMakeLists\\.txt\\'" . cmake-mode))
-       '(("\\.cmake\\'" . cmake-mode))
-       auto-mode-alist))
-
-(defun company-cmake-setup ()
-  (add-to-list 'company-backends 'company-cmake))
-(add-hook 'cmake-mode-hook 'company-cmake-setup)
+  (use-package org-journal
+    :ensure t
+    :custom
+  (org-journal-dir "~/Documents/emacs/journal/")
+  (org-journal-enable-agenda-integration t)
+  (org-journal-date-prefix "#+TITLE: ")
+  (org-journal-time-prefix "* ")
+  (org-journal-date-format "%a, %Y-%m-%d")
+  (org-journal-file-format "%Y-%m-%d.org")
+    :config
+  (setq org-agenda-file-regexp "\\`[^.].*\\.org'\\|[0-9]+$")
+  (add-to-list 'org-agenda-files org-journal-dir))
 #+END_SRC
